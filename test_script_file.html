@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CareStaff Script Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        button {
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        #results {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .success {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>CareStaff API Test</h1>
+    
+    <div>
+        <label>Your Google Apps Script URL:</label>
+        <input type="text" id="apiUrl" placeholder="https://script.google.com/macros/s/YOUR_ID/exec">
+    </div>
+
+    <h3>Test 1: Check if API is Running</h3>
+    <button onclick="testApiRunning()">Test API Connection</button>
+
+    <h3>Test 2: Submit Test Job</h3>
+    <button onclick="testJobSubmission()">Submit Test Job</button>
+
+    <h3>Test 3: Register Test Doctor</h3>
+    <button onclick="testDoctorRegistration()">Register Test Doctor</button>
+
+    <h3>Test 4: Get All Jobs</h3>
+    <button onclick="testGetJobs()">Get Jobs</button>
+
+    <h3>Test 5: Get All Doctors</h3>
+    <button onclick="testGetDoctors()">Get Doctors</button>
+
+    <div id="results">Results will appear here...</div>
+
+    <script>
+        function getApiUrl() {
+            const url = document.getElementById('apiUrl').value;
+            if (!url) {
+                alert('Please enter your Google Apps Script URL first!');
+                return null;
+            }
+            return url;
+        }
+
+        function showResult(message, isSuccess = true) {
+            const resultsDiv = document.getElementById('results');
+            const className = isSuccess ? 'success' : 'error';
+            const timestamp = new Date().toLocaleTimeString();
+            resultsDiv.innerHTML = `<span class="${className}">[${timestamp}] ${message}</span>\n\n` + resultsDiv.innerHTML;
+        }
+
+        async function testApiRunning() {
+            const url = getApiUrl();
+            if (!url) return;
+
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                showResult('API Response: ' + text, true);
+            } catch (error) {
+                showResult('Error: ' + error.message, false);
+            }
+        }
+
+        async function testJobSubmission() {
+            const url = getApiUrl();
+            if (!url) return;
+
+            const testJob = {
+                action: 'submitJob',
+                timestamp: new Date().toISOString(),
+                siteLocation: 'Cape Town - Medirite Site A',
+                serviceType: 'General Practitioner',
+                dateNeeded: '2025-10-10',
+                startTime: '08:00',
+                endTime: '17:00',
+                contactPerson: 'Test Person',
+                contactPhone: '+27 82 123 4567',
+                requirements: 'Test requirements',
+                estimatedHours: '9 hours',
+                rateType: 'Weekday',
+                hourlyRate: 'R650/hour',
+                totalCost: 'R5850'
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testJob)
+                });
+
+                const data = await response.json();
+                showResult('Job Submission Response:\n' + JSON.stringify(data, null, 2), data.status === 'success');
+                
+                if (data.status === 'success') {
+                    showResult('Check your Google Sheets "Jobs" tab for the new entry!', true);
+                }
+            } catch (error) {
+                showResult('Error submitting job: ' + error.message, false);
+            }
+        }
+
+        async function testDoctorRegistration() {
+            const url = getApiUrl();
+            if (!url) return;
+
+            const testDoctor = {
+                action: 'registerDoctor',
+                timestamp: new Date().toISOString(),
+                fullName: 'Dr. Test Doctor',
+                email: 'test@email.com',
+                mobile: '+27 82 999 8888',
+                hpcsa: 'MP999999',
+                specialty: 'General Practitioner',
+                experience: '5-10 years',
+                availability: 'Available Immediately',
+                regions: 'Western Cape',
+                additionalInfo: 'This is a test registration'
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testDoctor)
+                });
+
+                const data = await response.json();
+                showResult('Doctor Registration Response:\n' + JSON.stringify(data, null, 2), data.status === 'success');
+                
+                if (data.status === 'success') {
+                    showResult('Check your Google Sheets "Doctors" tab for the new entry!', true);
+                }
+            } catch (error) {
+                showResult('Error registering doctor: ' + error.message, false);
+            }
+        }
+
+        async function testGetJobs() {
+            const url = getApiUrl();
+            if (!url) return;
+
+            try {
+                const response = await fetch(url + '?action=getJobs');
+                const data = await response.json();
+                showResult('Get Jobs Response:\n' + JSON.stringify(data, null, 2), data.status === 'success');
+            } catch (error) {
+                showResult('Error getting jobs: ' + error.message, false);
+            }
+        }
+
+        async function testGetDoctors() {
+            const url = getApiUrl();
+            if (!url) return;
+
+            try {
+                const response = await fetch(url + '?action=getDoctors');
+                const data = await response.json();
+                showResult('Get Doctors Response:\n' + JSON.stringify(data, null, 2), data.status === 'success');
+            } catch (error) {
+                showResult('Error getting doctors: ' + error.message, false);
+            }
+        }
+    </script>
+</body>
+</html>

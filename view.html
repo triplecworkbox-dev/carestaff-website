@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Jobs - CareStaff</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+        }
+
+        .doctor-name {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .stats-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .filters {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-size: 13px;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 10px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .jobs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .jobs-count {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .refresh-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+        }
+
+        .job-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .job-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+
+        .job-card.accepting {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .job-location {
+            background: #3498db;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .job-pay {
+            font-size: 24px;
+            font-weight: bold;
+            color: #27ae60;
+        }
+
+        .job-date {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .job-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .detail-icon {
+            font-size: 16px;
+        }
+
+        .job-requirements {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .job-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-accept {
+            flex: 1;
+            padding: 15px;
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-accept:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .btn-details {
+            padding: 15px 30px;
+            background: white;
+            color: #3498db;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-details:hover {
+            background: #3498db;
+            color: white;
+        }
+
+        .urgency-badge {
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            background: #e74c3c;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 2px 10px rgba(231, 76, 60, 0.3);
+        }
+
+        .rate-breakdown {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 15px;
+            background: #e8f5e8;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #666;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-close {
+            font-size: 28px;
+            cursor: pointer;
+            color: #666;
+            background: none;
+            border: none;
+        }
+
+        @media (max-width: 768px) {
+            .stats-bar {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .filter-row {
+                grid-template-columns: 1fr;
+            }
+
+            .job-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .job-pay {
+                font-size: 20px;
+            }
+
+            .job-details {
+                grid-template-columns: 1fr;
+            }
+
+            .job-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div>
+                <h1>🏥 CareStaff - Available Jobs</h1>
+                <div class="doctor-name" id="doctorWelcome">Welcome, Doctor</div>
+            </div>
+            <a href="/doctor-profile" style="color: white; text-decoration: none;">My Profile →</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-number" id="availableJobsCount">-</div>
+                <div class="stat-label">Available Jobs</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="todayJobsCount">-</div>
+                <div class="stat-label">Starting Today</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="potentialEarnings">-</div>
+                <div class="stat-label">Potential Earnings</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>Location</label>
+                    <select id="filterLocation" onchange="applyFilters()">
+                        <option value="">All Locations</option>
+                        <option value="Cape Town">Cape Town</option>
+                        <option value="Durban">Durban</option>
+                        <option value="Port Elizabeth">Port Elizabeth</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Date Range</label>
+                    <select id="filterDate" onchange="applyFilters()">
+                        <option value="">All Dates</option>
+                        <option value="today">Today</option>
+                        <option value="tomorrow">Tomorrow</option>
+                        <option value="week">Next 7 Days</option>
+                        <option value="month">Next 30 Days</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Day Type</label>
+                    <select id="filterDayType" onchange="applyFilters()">
+                        <option value="">All Days</option>
+                        <option value="Weekday">Weekday</option>
+                        <option value="Weekend">Weekend</option>
+                        <option value="Public Holiday">Public Holiday</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Sort By</label>
+                    <select id="sortBy" onchange="applyFilters()">
+                        <option value="date">Date (Soonest First)</option>
+                        <option value="pay">Highest Pay</option>
+                        <option value="location">Location</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Jobs Header -->
+        <div class="jobs-header">
+            <div class="jobs-count" id="jobsCountDisplay">Loading jobs...</div>
+            <button class="refresh-btn" onclick="loadJobs()">🔄 Refresh</button>
+        </div>
+
+        <!-- Jobs List -->
+        <div id="jobsList" class="loading">
+            <div class="loading-spinner"></div>
+            <p>Loading available jobs...</p>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Confirm Job Acceptance</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        // REPLACE WITH YOUR GOOGLE APPS SCRIPT URL
+        const API_URL = 'https://script.google.com/macros/s/AKfycbyrIqzfg3Ob2GuY1erBPBQjAvx3quo1c5d3Pe6Ho1bDEMFcbhN66fzhI_W5v8bhj9hznw/exec';
+        
+        // Get doctor email from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const doctorEmail = urlParams.get('email');
+        
+        let allJobs = [];
+        let filteredJobs = [];
+        let currentDoctor = null;
+
+        // Check authentication
+        if (!doctorEmail) {
+            alert('Please access this page from your profile link');
+            window.location.href = '/';
+        }
+
+        // Load on page start
+        window.addEventListener('load', () => {
+            loadDoctorInfo();
+            loadJobs();
+            // Auto-refresh every 30 seconds
+            setInterval(loadJobs, 30000);
+        });
+
+        async function loadDoctorInfo() {
+            try {
+                const response = await fetch(`${API_URL}?action=getDoctors`);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    currentDoctor = data.doctors.find(d => d.email === doctorEmail);
+                    if (currentDoctor) {
+                        document.getElementById('doctorWelcome').textContent = 
+                            `Welcome, ${currentDoctor.fullName}`;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading doctor info:', error);
+            }
+        }
+
+        async function loadJobs() {
+            try {
+                const response = await fetch(`${API_URL}?action=getJobs`);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    // Only show pending jobs that match doctor's specialty
+                    allJobs = data.jobs.filter(job => 
+                        job.status === 'Pending' && 
+                        (currentDoctor ? job.serviceType === currentDoctor.specialty : true)
+                    );
+                    
+                    updateStats();
+                    applyFilters();
+                }
+            } catch (error) {
+                console.error('Error loading jobs:', error);
+                document.getElementById('jobsList').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <h3>Connection Error</h3>
+                        <p>Please check your internet connection and try again.</p>
+                        <button class="refresh-btn" onclick="loadJobs()" style="margin-top: 20px;">Retry</button>
+                    </div>
+                `;
+            }
+        }
+
+        function updateStats() {
+            const today = new Date().toISOString().split('T')[0];
+            const todayJobs = allJobs.filter(job => job.dateNeeded === today);
+            const totalEarnings = allJobs.reduce((sum, job) => {
+                const cost = parseInt(job.totalCost.replace(/[^0-9]/g, ''));
+                return sum + (cost * 0.9); // Assuming 10% commission
+            }, 0);
+
+            document.getElementById('availableJobsCount').textContent = allJobs.length;
+            document.getElementById('todayJobsCount').textContent = todayJobs.length;
+            document.getElementById('potentialEarnings').textContent = 
+                'R' + totalEarnings.toLocaleString();
+        }
+
+        function applyFilters() {
+            const location = document.getElementById('filterLocation').value;
+            const dateRange = document.getElementById('filterDate').value;
+            const dayType = document.getElementById('filterDayType').value;
+            const sortBy = document.getElementById('sortBy').value;
+
+            // Filter jobs
+            filteredJobs = allJobs.filter(job => {
+                // Location filter
+                if (location && !job.siteLocation.includes(location)) return false;
+                
+                // Date range filter
+                if (dateRange) {
+                    const jobDate = new Date(job.dateNeeded);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    
+                    if (dateRange === 'today' && jobDate.toDateString() !== today.toDateString()) return false;
+                    if (dateRange === 'tomorrow') {
+                        const tomorrow = new Date(today);
+                        tomorrow.setDate(tomorrow.getDate() + 1);
+                        if (jobDate.toDateString() !== tomorrow.toDateString()) return false;
+                    }
+                    if (dateRange === 'week') {
+                        const weekFromNow = new Date(today);
+                        weekFromNow.setDate(weekFromNow.getDate() + 7);
+                        if (jobDate > weekFromNow) return false;
+                    }
+                    if (dateRange === 'month') {
+                        const monthFromNow = new Date(today);
+                        monthFromNow.setDate(monthFromNow.getDate() + 30);
+                        if (jobDate > monthFromNow) return false;
+                    }
+                }
+                
+                // Day type filter
+                if (dayType && job.rateType !== dayType) return false;
+                
+                return true;
+            });
+
+            // Sort jobs
+            filteredJobs.sort((a, b) => {
+                if (sortBy === 'date') {
+                    return new Date(a.dateNeeded) - new Date(b.dateNeeded);
+                } else if (sortBy === 'pay') {
+                    const payA = parseInt(a.totalCost.replace(/[^0-9]/g, ''));
+                    const payB = parseInt(b.totalCost.replace(/[^0-9]/g, ''));
+                    return payB - payA;
+                } else if (sortBy === 'location') {
+                    return a.siteLocation.localeCompare(b.siteLocation);
+                }
+                return 0;
+            });
+
+            displayJobs();
+        }
+
+        function displayJobs() {
+            const container = document.getElementById('jobsList');
+            const countDisplay = document.getElementById('jobsCountDisplay');
+            
+            countDisplay.textContent = `${filteredJobs.length} Available Job${filteredJobs.length !== 1 ? 's' : ''}`;
+
+            if (filteredJobs.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <h3>No Jobs Available</h3>
+                        <p>Check back soon or adjust your filters to see more opportunities.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filteredJobs.map(job => createJobCard(job)).join('');
+        }
+
+        function createJobCard(job) {
+            const jobDate = new Date(job.dateNeeded);
+            const today = new Date();
+            const isToday = jobDate.toDateString() === today.toDateString();
+            const isTomorrow = jobDate.toDateString() === new Date(today.setDate(today.getDate() + 1)).toDateString();
+            
+            const practitionerFee = parseInt(job.totalCost.replace(/[^0-9]/g, '')) * 0.9; // 90% to doctor
+            
+            return `
+                <div class="job-card" id="job-${job.jobId}">
+                    ${isToday ? '<div class="urgency-badge">🔥 TODAY</div>' : ''}
+                    ${isTomorrow && !isToday ? '<div class="urgency-badge" style="background: #f39c12;">TOMORROW</div>' : ''}
+                    
+                    <div class="job-header">
+                        <div class="job-location">${job.siteLocation}</div>
+                        <div class="job-pay">R${Math.round(practitionerFee).toLocaleString()}</div>
+                    </div>
+
+                    <div class="job-date">
+                        Shift: ${formatDate(job.dateNeeded)} • ${job.startTime} - ${job.endTime}
+                    </div>
+
+<div class="job-timestamp">
+  Posted: ${new Date(job.timestamp).toLocaleString('en-ZA', { 
+    day: 'numeric', 
+    month: 'short', 
+    hour: '2-digit', 
+    minute: '2-digit' 
+  })}
+</div>
+                    <div class="job-details">
+                        <div class="detail-item">
+                            <span class="detail-icon">💼</span>
+                            <span>${job.serviceType}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">⏱️</span>
+                            <span>${job.estimatedHours}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">📅</span>
+                            <span>${job.rateType}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">👤</span>
+                            <span>${job.contactPerson}</span>
+                        </div>
+                    </div>
+
+                    ${job.requirements ? `
+                    <div class="job-requirements">
+                        <strong>⚠️ Requirements:</strong> ${job.requirements}
+                    </div>
+                    ` : ''}
+
+                    <div class="rate-breakdown">
+                        <span><strong>Your Earnings:</strong></span>
+                        <span><strong>R${Math.round(practitionerFee).toLocaleString()}</strong></span>
+                    </div>
+
+                    <div class="job-actions">
+                        <button class="btn-accept" onclick="confirmAcceptJob('${job.jobId}')">
+                            ✅ Accept This Job
+                        </button>
+                        <button class="btn-details" onclick="showJobDetails('${job.jobId}')">
+                            Details
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('en-ZA', options);
+        }
+function confirmAcceptJob(jobId) {
+    const job = allJobs.find(j => j.jobId === jobId);
+    if (!job) return;
+
+    const practitionerFee = parseInt(job.totalCost.replace(/[^0-9]/g, '')) * 0.9;
+
+    document.getElementById('modalBody').innerHTML = `
+        <div style="margin-bottom: 20px;">
+            <h3 style="color: #27ae60; margin-bottom: 15px;">Confirm Job Acceptance</h3>
+            
+            <div style="margin-bottom: 20px;">
+                <p style="margin-bottom: 10px;"><strong>Location:</strong></p>
+                <p style="color: #666;">${job.siteLocation}</p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <p style="margin-bottom: 10px;"><strong>Date & Time:</strong></p>
+                <p style="color: #666;">${formatDate(job.dateNeeded)}</p>
+                <p style="color: #666;">${job.startTime} - ${job.endTime} (${job.estimatedHours})</p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <p style="margin-bottom: 10px;"><strong>Service Type:</strong></p>
+                <p style="color: #666;">${job.serviceType}</p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <p style="margin-bottom: 10px;"><strong>Contact Person:</strong></p>
+                <p style="color: #666;">${job.contactPerson}</p>
+                <p style="color: #666;">📞 ${job.contactPhone}</p>
+            </div>
+
+            ${job.requirements ? `
+            <div style="margin-bottom: 20px;">
+                <p style="margin-bottom: 10px;"><strong>Special Requirements:</strong></p>
+                <p style="color: #666;">${job.requirements}</p>
+            </div>
+            ` : ''}
+
+            <div style="margin-bottom: 20px;">
+                <p style="margin-bottom: 10px;"><strong>Rate Information:</strong></p>
+                <p style="color: #666;">Day Type: ${job.rateType}</p>
+                <p style="color: #666;">Rate: ${job.hourlyRate}</p>
+            </div>
+
+            <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <p style="margin-bottom: 5px;"><strong>Your Earnings:</strong></p>
+                <p style="font-size: 24px; color: #27ae60; font-weight: bold;">R${Math.round(practitionerFee).toLocaleString()}</p>
+                <p style="font-size: 12px; color: #666; margin-top: 5px;">Payment processed within 48 hours of shift completion</p>
+            </div>
+
+            <button onclick="acceptJob('${jobId}')" class="btn-accept" style="width: 100%;">
+                ✅ Confirm & Accept Job
+            </button>
+        </div>
+    `;
+
+    document.getElementById('confirmModal').classList.add('show');
+}
+
+async function acceptJob(jobId) {
+    if (!currentDoctor) {
+        alert('Error: Doctor information not loaded');
+        return;
+    }
+
+    const jobCard = document.getElementById(`job-${jobId}`);
+    if (jobCard) {
+        jobCard.classList.add('accepting');
+    }
+
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'assignDoctor',
+                jobId: jobId,
+                doctorName: currentDoctor.fullName,
+                doctorEmail: currentDoctor.email
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.status === 'success') {
+            closeModal();
+            alert(`✅ Job accepted successfully!\n\nContact: ${data.doctorPhone || 'Will be provided'}\n\nYou will receive a confirmation email shortly.`);
+            loadJobs(); // Refresh the job list
+        } else {
+            alert('Error accepting job: ' + data.message);
+            if (jobCard) {
+                jobCard.classList.remove('accepting');
+            }
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Connection error. Please try again.');
+        if (jobCard) {
+            jobCard.classList.remove('accepting');
+        }
+    }
+}
+        
+function showJobDetails(jobId) {
+    const job = allJobs.find(j => j.jobId === jobId);
+    if (!job) return;
+
+    const practitionerFee = parseInt(job.totalCost.replace(/[^0-9]/g, '')) * 0.9;
+
+    document.getElementById('modalBody').innerHTML = `
+        <div style="margin-bottom: 20px;">
+            <h3 style="color: #3498db; margin-bottom: 15px;">Job Details</h3>
+            
+            <div style="margin-bottom: 15px;">
+                <p style="margin-bottom: 5px;"><strong>Job ID:</strong></p>
+                <p style="color: #666;">${job.jobId}</p>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <p style="margin-bottom: 5px;"><strong>Location:</strong></p>
+                <p style="color: #666;">${job.siteLocation}</p>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <p style="margin-bottom: 5px;"><strong>Date & Time:</strong></p>
+                <p style="color: #666;">${formatDate(job.dateNeeded)}</p>
+                <p style="color: #666;">${job.startTime} - ${job.endTime}</p>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <p style="margin-bottom: 5px;"><strong>Duration:</strong></p>
+                <p style="color: #666;">${job.estimatedHours}</p>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <p style="margin-bottom: 5px;"><strong>Service Type:</strong></p>
+                <p style="color: #666;">${job.serviceType}</p>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <p style="margin-bottom: 5px;"><strong>Day Type:</strong></p>
+                <p style="color: #666;">${job.rateType}</p>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <p style="margin-bottom: 5px;"><strong>Contact Person:</strong></p>
+                <p style="color: #666;">${job.contactPerson}</p>
+                <p style="color: #666;">📞 ${job.contactPhone}</p>
+            </div>
+
+            ${job.requirements ? `
+            <div style="margin-bottom: 15px; background: #fff3cd; padding: 12px; border-radius: 6px;">
+                <p style="margin-bottom: 5px;"><strong>⚠️ Special Requirements:</strong></p>
+                <p style="color: #666;">${job.requirements}</p>
+            </div>
+            ` : ''}
+
+            <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <p style="margin-bottom: 5px;"><strong>Your Earnings:</strong></p>
+                <p style="font-size: 24px; color: #27ae60; font-weight: bold;">R${Math.round(practitionerFee).toLocaleString()}</p>
+                <p style="font-size: 11px; color: #666; margin-top: 5px;">Total cost: R${job.totalCost} (90% to practitioner, 10% admin fee)</p>
+            </div>
+
+            <div style="margin-bottom: 15px; font-size: 12px; color: #999;">
+                <p>Posted: ${new Date(job.timestamp).toLocaleString('en-ZA')}</p>
+            </div>
+
+            <button onclick="confirmAcceptJob('${jobId}')" class="btn-accept" style="width: 100%; margin-bottom: 10px;">
+                ✅ Accept This Job
+            </button>
+            <button onclick="closeModal()" class="btn-details" style="width: 100%;">
+                Close
+            </button>
+        </div>
+    `;
+
+    document.getElementById('confirmModal').classList.add('show');
+}
+        function closeModal() {
+            document.getElementById('confirmModal').classList.remove('show');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('confirmModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareStaff - Doctor Registration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .form-content {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-submit:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .success-message {
+            display: none;
+            background: #d4edda;
+            border: 2px solid #27ae60;
+            color: #155724;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            border: 2px solid #e74c3c;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .info-box {
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 25px;
+        }
+
+        .info-box strong {
+            color: #2c3e50;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>CareStaff</h1>
+            <p>Doctor/Pharmacist Registration</p>
+        </div>
+
+        <div class="form-content">
+            <div class="info-box">
+                <strong>Join Our Network</strong><br>
+                Register to receive locum job opportunities across South Africa. All registrations are verified before activation.
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+
+            <form id="registrationForm">
+                <div class="form-group">
+                    <label>Full Name <span class="required">*</span></label>
+                    <input type="text" id="fullName" placeholder="Dr. Sarah Williams" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email Address <span class="required">*</span></label>
+                        <input type="email" id="email" placeholder="sarah@email.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Mobile Number <span class="required">*</span></label>
+                        <input type="tel" id="mobile" placeholder="+27 82 123 4567" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>HPCSA Registration <span class="required">*</span></label>
+                        <input type="text" id="hpcsa" placeholder="MP123456" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Years Experience <span class="required">*</span></label>
+                        <select id="experience" required>
+                            <option value="">Select</option>
+                            <option value="0-1 years">0-1 years</option>
+                            <option value="2-3 years">2-3 years</option>
+                            <option value="4-5 years">4-5 years</option>
+                            <option value="5-10 years">5-10 years</option>
+                            <option value="10+ years">10+ years</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Primary Specialty <span class="required">*</span></label>
+                    <select id="specialty" required>
+                        <option value="">Select Specialty</option>
+                        <option value="General Practitioner">General Practitioner</option>
+                        <option value="Pharmacist">Pharmacist</option>
+                        <option value="Emergency Medicine">Emergency Medicine</option>
+                        <option value="Internal Medicine">Internal Medicine</option>
+                        <option value="Pediatrics">Pediatrics</option>
+                        <option value="Surgery">Surgery</option>
+                        <option value="Anesthesiology">Anesthesiology</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Current Availability <span class="required">*</span></label>
+                    <select id="availability" required>
+                        <option value="">Select Availability</option>
+                        <option value="Available Immediately">Available Immediately</option>
+                        <option value="Available This Week">Available This Week</option>
+                        <option value="Available Next Week">Available Next Week</option>
+                        <option value="Available Next Month">Available Next Month</option>
+                        <option value="Not Currently Available">Not Currently Available</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Preferred Regions (Optional)</label>
+                    <textarea id="regions" rows="2" placeholder="e.g., Gauteng, Western Cape, KwaZulu-Natal"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Additional Information (Optional)</label>
+                    <textarea id="additionalInfo" rows="2" placeholder="Any additional qualifications, certifications, or information..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn">Join CareStaff Network</button>
+
+                <div class="success-message" id="successMessage">
+                    <h3>Registration Submitted!</h3>
+                    <p>Thank you for joining CareStaff. Your registration will be verified within 24-48 hours.</p>
+                    <p style="margin-top: 10px;"><strong>We'll contact you at: <span id="confirmEmail"></span></strong></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            errorMessage.classList.remove('show');
+            successMessage.classList.remove('show');
+
+            // Collect form data
+            const formData = {
+                action: 'registerDoctor',
+                timestamp: new Date().toISOString(),
+                fullName: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                mobile: document.getElementById('mobile').value,
+                hpcsa: document.getElementById('hpcsa').value,
+                specialty: document.getElementById('specialty').value,
+                experience: document.getElementById('experience').value,
+                availability: document.getElementById('availability').value,
+                regions: document.getElementById('regions').value,
+                additionalInfo: document.getElementById('additionalInfo').value
+            };
+
+            try {
+                // REPLACE THIS URL WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
+                const scriptUrl = 'https://script.google.com/macros/s/AKfycbyrIqzfg3Ob2GuY1erBPBQjAvx3quo1c5d3Pe6Ho1bDEMFcbhN66fzhI_W5v8bhj9hznw/exec';
+                
+                const response = await fetch(scriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                // Show success message
+                document.getElementById('confirmEmail').textContent = formData.email;
+                successMessage.classList.add('show');
+                
+                // Reset form after 3 seconds
+                setTimeout(() => {
+                    document.getElementById('registrationForm').reset();
+                    successMessage.classList.remove('show');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Join CareStaff Network';
+                }, 3000);
+
+            } catch (error) {
+                errorMessage.textContent = 'Error submitting registration. Please try again.';
+                errorMessage.classList.add('show');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Join CareStaff Network';
+            }
+        });
+    </script>
+</body>
+</html>
